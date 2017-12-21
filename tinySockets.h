@@ -25,7 +25,7 @@ int startConnecting( const char *inIPAddress, int inPort );
 //   1 if connected
 //   0 if still trying to connect
 //  -1 on error
-char isConnected( int inSocket );
+int isConnected( int inSocket );
 
 
 
@@ -51,8 +51,7 @@ char isConnected( int inSocket );
 //   server socket handle for server socket that has a new connection waiting
 //   or
 //  -1 on error 
-int waitForSocketEvent( int inSocket, int inTimeoutInMilliseconds,
-                        char *outServerSocket );
+int waitForSocketEvent( int inTimeoutInMilliseconds, char *outServerSocket );
 
 
 
