@@ -7,6 +7,7 @@
 
 
 
+
 //////////////////////
 // client functions //
 //////////////////////
@@ -36,7 +37,9 @@ char isConnected( int inSocket );
 /////////////////////////////////
 
 
-
+// Waits for a socket to have receivable data or a server socket
+// to have a new connection
+// 
 // *outServerSocket is set to:
 //   true if the triggered socket is a server socket
 //   or
