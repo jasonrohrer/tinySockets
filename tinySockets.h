@@ -21,6 +21,11 @@ int startConnecting( const char *inIPAddress, int inPort );
 
 
 
+// check whether a socket created through startConnecting has connected
+// Note that after 1 is returned from this call, future calls will return
+// undefined results (this function does not determine if the socket is 
+// STILL connected later).
+//
 // returns:
 //   1 if connected
 //   0 if still trying to connect
