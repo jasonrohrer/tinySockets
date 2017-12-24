@@ -358,6 +358,15 @@ int acceptConnection( int inServerSocket ) {
 		return -1;
 		}
 
+
+    // enable no-delay on newly connected socket
+    int flag = 1;
+    setsockopt( acceptedID,
+                IPPROTO_TCP,
+                TCP_NODELAY,
+                (char *) &flag,
+                sizeof(int) );
+
     addSockToPoll( acceptedID );
     
     return acceptedID;

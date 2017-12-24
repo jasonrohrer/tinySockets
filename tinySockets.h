@@ -1,11 +1,6 @@
 // placed in the public domain by Jason Rohrer
 
 
-// change this value based on your application
-// internal memory is statically allocated with no mallocs
-#define MAX_LIVE_SOCKETS  1024
-
-
 
 
 //////////////////////
