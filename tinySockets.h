@@ -45,32 +45,30 @@ int isConnected( int inSocket );
 // Waits for a socket to have receivable data or a server socket
 // to have a new connection
 // 
-// *outServerSocket is set to:
-//   true if the triggered socket is a server socket
-//   or
-//   false if the triggered socket is a connected socket
-// 
 // returns:
 //   socket handle for socket with data that can be received 
 //   or
 //   server socket handle for server socket that has a new connection waiting
 //   or
+//   0 on timeout
+//   or
 //  -1 on error 
-int waitForSocketEvent( int inTimeoutInMilliseconds, char *outServerSocket );
+int waitForSocketEvent( int inTimeoutInMilliseconds );
 
 
 
 // returns:
 //   number of bytes sent (including, possibly, 0 if socket is blocked)
 //  -1 on error
-int send( int inSocket, unsigned char *inBytes, int inNumToSend );
+int socketSend( int inSocket, unsigned char *inBytes, int inNumToSend );
 
 
 
 // returns:
 //   number of bytes received
 //  -1 on error
-int receive( int inSocket, unsigned char *inBytes, int inMaxNumToReceive );
+int socketReceive( int inSocket, unsigned char *inBytes, 
+                   int inMaxNumToReceive );
 
 
 
@@ -92,7 +90,7 @@ void closeSocket( int inSocket );
 //   server socket handle
 //   or
 //  -1 on error
-int startServer( int inPort );
+int startServer( int inPort, int inBacklogSize );
 
 
 
