@@ -67,23 +67,23 @@ int startConnecting( const char *inIPAddress, int inPort ) {
         return -1;
         }
 
-    int socketID = socket( AF_INET, SOCK_STREAM, 0 );	
+    int socketID = socket( AF_INET, SOCK_STREAM, 0 );    
 
     union sock {
             struct  sockaddr s;
 
             struct  sockaddr_in i;
-		} sock;
+        } sock;
     
     
     sock.i.sin_family = AF_INET;
-	sock.i.sin_port = htons( inPort );
-	sock.i.sin_addr = internetAddress;
+    sock.i.sin_port = htons( inPort );
+    sock.i.sin_addr = internetAddress;
 
 
     int ret = fcntl( socketID, F_SETFL, O_NONBLOCK );
-	
-	if( ret < 0 ) {
+    
+    if( ret < 0 ) {
         printf( 
             "startConnecting:  failed to put socket in non-blocking mode\n" );
         close( socketID );
@@ -92,8 +92,8 @@ int startConnecting( const char *inIPAddress, int inPort ) {
 
 
     ret = connect( socketID, &( sock.s ), sizeof( struct sockaddr ) );
-	
-	if( ret < 0 && errno != EINPROGRESS) {
+    
+    if( ret < 0 && errno != EINPROGRESS) {
         printf( 
             "startConnecting:  connect failed (error= %s)\n",
             strerror( errno ) );
@@ -108,19 +108,19 @@ int startConnecting( const char *inIPAddress, int inPort ) {
 
 int isConnected( int inSocket ) {
     fd_set fsr;
-	struct timeval tv;
-	int val;
+    struct timeval tv;
+    int val;
     socklen_t len;
 
-	FD_ZERO( &fsr );
-	FD_SET( inSocket, &fsr );
+    FD_ZERO( &fsr );
+    FD_SET( inSocket, &fsr );
 
     // check if connection event waiting right now
     // timeout of 0
     tv.tv_sec = 0;
-	tv.tv_usec = 0;    
+    tv.tv_usec = 0;    
 
-	int ret = select( inSocket + 1, NULL, &fsr, NULL, &tv );
+    int ret = select( inSocket + 1, NULL, &fsr, NULL, &tv );
 
     while( ret < 0 && errno == EINTR ) {
         // interrupted during select
@@ -129,28 +129,28 @@ int isConnected( int inSocket ) {
         }
 
 
-	if( ret == 0 ) {
-		// timeout
-		return 0;
+    if( ret == 0 ) {
+        // timeout
+        return 0;
         }
     
 
     // no timeout
     // error?
 
-	len = 4;
-	ret = getsockopt( inSocket, SOL_SOCKET, SO_ERROR, &val, &len );
-	
-	if( ret < 0 ) {
-		// error
+    len = 4;
+    ret = getsockopt( inSocket, SOL_SOCKET, SO_ERROR, &val, &len );
+    
+    if( ret < 0 ) {
+        // error
         return -1;
         }
 
-	if( val != 0 ) {
+    if( val != 0 ) {
         // error
-		return -1;
+        return -1;
         }
-	
+    
     // success
     
 
@@ -209,16 +209,16 @@ int socketReceive( int inSocket, unsigned char *inBytes,
     // and to distinguish data from error
 
     fd_set fsr;
-	struct timeval tv;
-	
-	
-	FD_ZERO( &fsr );
-	FD_SET( inSocket, &fsr );
+    struct timeval tv;
+    
+    
+    FD_ZERO( &fsr );
+    FD_SET( inSocket, &fsr );
  
-	tv.tv_sec = 0;
-	tv.tv_usec = 0;
-	
-	int ret = select( inSocket + 1, &fsr, NULL, NULL, &tv );
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+    
+    int ret = select( inSocket + 1, &fsr, NULL, NULL, &tv );
 
     
     while( ret < 0 && errno == EINTR ) {
@@ -292,12 +292,12 @@ int startServer( int inPort, int inBacklogSize ) {
     int error;
     
     int sockID = socket( AF_INET, SOCK_STREAM, 0 );
-	
-	if( sockID == -1 ) {
-		printf( "startServer:  Failed to construct a socket\n" );
-		return -1;
-    	}
-	
+    
+    if( sockID == -1 ) {
+        printf( "startServer:  Failed to construct a socket\n" );
+        return -1;
+        }
+    
 
     // this setsockopt code partially copied from gnut
     
@@ -306,7 +306,7 @@ int startServer( int inPort, int inBacklogSize ) {
     // (otherwise, rebinding to the same port will fail for a while
     //  after the server is shut down)
     int reuseAddressValue = 1;
-	error = setsockopt( sockID,
+    error = setsockopt( sockID,
                         SOL_SOCKET,      // socket-level option
                         SO_REUSEADDR,    // reuse address option
                         &reuseAddressValue,  // value to set for this option
@@ -314,35 +314,35 @@ int startServer( int inPort, int inBacklogSize ) {
 
     
     if( error == -1  ) {
-		printf( "startServer:  Failed to set socket options\n" );
-		return -1;
-		}
-	
+        printf( "startServer:  Failed to set socket options\n" );
+        return -1;
+        }
+    
 
     union sock {
             struct  sockaddr s;
             
             struct  sockaddr_in i;
-		} sock;
+        } sock;
 
-	sock.i.sin_family = AF_INET;
-	sock.i.sin_port = htons( inPort );
-	sock.i.sin_addr.s_addr = INADDR_ANY;
-	
-	error = bind( sockID,  &( sock.s ), sizeof( sockaddr ) );
-	
-	if( error == -1  ) {
-		printf( "startServer:  Bad socket bind, port %d\n", inPort );
-		return -1;
-		}
-	
-	
-	// start listening for connections
-	error = listen( sockID, inBacklogSize );
-	if( error == -1 ) {
-		printf( "startServer:: Bad socket listen\n" );
-		return -1;
-		}
+    sock.i.sin_family = AF_INET;
+    sock.i.sin_port = htons( inPort );
+    sock.i.sin_addr.s_addr = INADDR_ANY;
+    
+    error = bind( sockID,  &( sock.s ), sizeof( sockaddr ) );
+    
+    if( error == -1  ) {
+        printf( "startServer:  Bad socket bind, port %d\n", inPort );
+        return -1;
+        }
+    
+    
+    // start listening for connections
+    error = listen( sockID, inBacklogSize );
+    if( error == -1 ) {
+        printf( "startServer:: Bad socket listen\n" );
+        return -1;
+        }
 
 
     addSockToPoll( sockID, true );
@@ -386,9 +386,9 @@ int acceptConnection( int inServerSocket ) {
     int acceptedID = accept( inServerSocket, NULL, NULL );
 
     if( acceptedID == -1 ) {
-		printf( "acceptConnection:: Failed to accept a network connection.\n" );
-		return -1;
-		}
+        printf( "acceptConnection:: Failed to accept a network connection.\n" );
+        return -1;
+        }
 
 
     // enable no-delay on newly connected socket
