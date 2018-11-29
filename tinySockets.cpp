@@ -122,6 +122,13 @@ int isConnected( int inSocket ) {
 
 	int ret = select( inSocket + 1, NULL, &fsr, NULL, &tv );
 
+    while( ret < 0 && errno == EINTR ) {
+        // interrupted during select
+        // try again
+        ret = select( inSocket + 1, &fsr, NULL, NULL, &tv );
+        }
+
+
 	if( ret == 0 ) {
 		// timeout
 		return 0;
@@ -213,6 +220,14 @@ int socketReceive( int inSocket, unsigned char *inBytes,
 	
 	int ret = select( inSocket + 1, &fsr, NULL, NULL, &tv );
 
+    
+    while( ret < 0 && errno == EINTR ) {
+        // interrupted during select
+        // try again
+        ret = select( inSocket + 1, &fsr, NULL, NULL, &tv );
+        }
+
+
     if( ret == 1 ) {
         
         int numReceived = recv( inSocket, inBytes, inMaxNumToReceive, 0 );
@@ -222,6 +237,17 @@ int socketReceive( int inSocket, unsigned char *inBytes,
             // must be an error
             return -1;
             }
+
+        
+        if( ret == -1 && 
+            ( errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK ) ) {
+            // select came back 1, but then our recv operation was interrupted
+            // or would block
+        
+            // treat like a timeout
+            return 0;
+            }
+
         return numReceived;
         }
     else if( ret == 0 ) {
@@ -341,6 +367,12 @@ int acceptConnection( int inServerSocket ) {
         
     int retval = select( inServerSocket + 1, &rfds, NULL, NULL, &tv );
     
+    while( retval < 0 && errno == EINTR ) {
+        // interrupted during select
+        // try again
+        retval = select( inServerSocket + 1, &rfds, NULL, NULL, &tv );
+        }
+
     if( retval == 0 ) {
         // timeout
         return 0;
